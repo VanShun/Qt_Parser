@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ruleediter.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -13,3 +14,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+void MainWindow::on_act_New_triggered()
+{
+    RuleEditer *editer = new RuleEditer();
+    editer->setWindowState(Qt::WindowNoState);
+    editer->setAttribute(Qt::WA_DeleteOnClose);
+    editer->show();
+}

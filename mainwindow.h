@@ -17,7 +17,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_act_New_triggered();
+    void on_act_OpenEditer_triggered();
 
 private:
     Ui::MainWindow *ui;

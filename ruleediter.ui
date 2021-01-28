@@ -77,10 +77,23 @@
     <property name="title">
      <string>文件</string>
     </property>
+    <addaction name="act_New"/>
+    <addaction name="act_Open"/>
     <addaction name="act_Save"/>
     <addaction name="act_Saveto"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>编辑</string>
+    </property>
+    <addaction name="act_Insert"/>
+    <addaction name="act_Apend"/>
+    <addaction name="act_Delete"/>
+    <addaction name="act_Undo"/>
+    <addaction name="act_trunc"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="act_Save">
@@ -89,6 +102,9 @@
    </property>
    <property name="toolTip">
     <string>act_Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="act_Saveto">
@@ -113,6 +129,58 @@
    </property>
    <property name="toolTip">
     <string>act_Apend</string>
+   </property>
+  </action>
+  <action name="act_New">
+   <property name="text">
+    <string>新建规则表</string>
+   </property>
+   <property name="toolTip">
+    <string>act_New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="act_Open">
+   <property name="text">
+    <string>打开规则表</string>
+   </property>
+   <property name="toolTip">
+    <string>act_Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="act_Delete">
+   <property name="text">
+    <string>删除行</string>
+   </property>
+   <property name="toolTip">
+    <string>act_Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="act_Undo">
+   <property name="text">
+    <string>撤销</string>
+   </property>
+   <property name="toolTip">
+    <string>act_Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="act_trunc">
+   <property name="text">
+    <string>清空</string>
+   </property>
+   <property name="toolTip">
+    <string>act_trunc</string>
    </property>
   </action>
  </widget>

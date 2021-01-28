@@ -6,8 +6,11 @@
 #include <QItemSelectionModel>
 #include <QSqlTableModel>
 #include <QDebug>
+#include <QInputDialog>
+#include <QSqlQuery>
+#include <QMessageBox>
 
-#define FIXED_CULUMCOUNT     5
+//#define FIXED_CULUMCOUNT     5
 
 namespace Ui {
 class RuleEditer;
@@ -29,9 +32,25 @@ private slots:
 
     void on_tableView_customContextMenuRequested(const QPoint &pos);
 
+    void on_act_New_triggered();
+
+    void on_act_Open_triggered();
+
+    void on_act_Delete_triggered();
+
+    void on_act_Undo_triggered();
+
+    void on_act_Save_triggered();
+
+    void on_act_Saveto_triggered();
+
+    void on_act_trunc_triggered();
+
 private:
     Ui::RuleEditer *ui;
     QSqlTableModel *themodel;
+    QSqlDatabase db;
+    QString curtable;
     //QItemSelectionModel *theselect;
 };
 

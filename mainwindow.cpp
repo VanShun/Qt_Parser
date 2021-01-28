@@ -15,7 +15,7 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_act_New_triggered()
+void MainWindow::on_act_OpenEditer_triggered()
 {
     RuleEditer *editer = new RuleEditer();
     editer->setWindowState(Qt::WindowNoState);

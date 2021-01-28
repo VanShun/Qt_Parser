@@ -9,6 +9,7 @@
 #include <QInputDialog>
 #include <QSqlQuery>
 #include <QMessageBox>
+#include <QtXml>
 
 //#define FIXED_CULUMCOUNT     5
 
@@ -24,6 +25,12 @@ public:
     explicit RuleEditer(QWidget *parent = nullptr);
     ~RuleEditer();
     void initEditer(void);
+
+    void intXmlFile(void);
+
+    void showXml(void);
+
+    void saveTabletoXml(void);
 
 private slots:
     void on_act_Insert_triggered();
@@ -51,6 +58,8 @@ private:
     QSqlTableModel *themodel;
     QSqlDatabase db;
     QString curtable;
+    QString xmlfilename;
+    QDomDocument doc;
     //QItemSelectionModel *theselect;
 };
 

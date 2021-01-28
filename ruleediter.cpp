@@ -42,6 +42,32 @@ void RuleEditer::initEditer()
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
+void RuleEditer::intXmlFile()
+{
+    QString xmlfilename = curtable;
+    xmlfilename += ".xml";
+    QFile file(xmlfilename);
+    if (!file.open(QIODevice::ReadWrite)) {
+        qDebug() << QString("open file %1 failed").arg(xmlfilename) << endl;
+        return;
+    }
+    if (!doc.setContent(&file)) {
+        qDebug() << "doc setContent failed" << endl;
+        file.close();
+        return;
+    }
+}
+
+void RuleEditer::showXml()
+{
+
+}
+
+void RuleEditer::saveTabletoXml()
+{
+
+}
+
 void RuleEditer::on_act_Insert_triggered()
 {
     int curRow = ui->tableView->currentIndex().row();
@@ -119,7 +145,7 @@ void RuleEditer::on_act_New_triggered()
     if (ok && !tablename.isEmpty()) {
         QSqlQuery query;
         QString str = "create table " + tablename;
-        str = str + "(id int primary key, len int, unit varchar(10), precision float, offset int)";
+        str = str + "(id int primary key, name varchar(20), len int, unit varchar(10), precision float, offset int)";
 
         if (!query.exec(str)) {
             qDebug() << "create table failed";

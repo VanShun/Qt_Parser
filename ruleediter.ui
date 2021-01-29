@@ -79,6 +79,7 @@
     </property>
     <addaction name="act_New"/>
     <addaction name="act_Open"/>
+    <addaction name="act_Drop"/>
     <addaction name="act_Save"/>
     <addaction name="act_Saveto"/>
    </widget>
@@ -181,6 +182,14 @@
    </property>
    <property name="toolTip">
     <string>act_trunc</string>
+   </property>
+  </action>
+  <action name="act_Drop">
+   <property name="text">
+    <string>删除规则表</string>
+   </property>
+   <property name="toolTip">
+    <string>act_Drop</string>
    </property>
   </action>
  </widget>

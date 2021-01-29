@@ -42,25 +42,45 @@ void RuleEditer::initEditer()
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
-void RuleEditer::intXmlFile()
+void RuleEditer::intXmlFile(INITFLAG flag)
 {
-    QString xmlfilename = curtable;
+    xmlfilename = curtable;
     xmlfilename += ".xml";
     QFile file(xmlfilename);
     if (!file.open(QIODevice::ReadWrite)) {
         qDebug() << QString("open file %1 failed").arg(xmlfilename) << endl;
         return;
+    } else qDebug() << QString("open file %1 success").arg(xmlfilename) << endl;
+
+    if (flag == INIT_NEW) {
+        QDomProcessingInstruction instruction = writedoc.createProcessingInstruction("xml", "version=\"1.0\"encoding=\"UTF-8\"");
+        writedoc.appendChild(instruction);    //添加xml申明
+        QDomElement root = writedoc.createElement("协议");
+        writedoc.appendChild(root);           //添加根结点
+        QTextStream out(&file);
+        writedoc.save(out, 4);
+    } else if (flag == INIT_OPEN) {
+        if (readdoc.setContent(&file)) {
+            qDebug() << "readdoc setContent failed" << endl;
+        }
     }
-    if (!doc.setContent(&file)) {
-        qDebug() << "doc setContent failed" << endl;
-        file.close();
-        return;
-    }
+    file.close();
+    showXml();
 }
 
 void RuleEditer::showXml()
 {
-
+    QFile afile(xmlfilename);
+    if (!afile.isOpen()) {
+        if (!afile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qDebug() << "open xml failed" << endl;
+            return;
+        }
+    }
+    QTextStream astream(&afile);
+    ui->plainTextEdit->setPlainText(astream.readAll());
+    astream.setAutoDetectUnicode(true);
+    afile.close();
 }
 
 void RuleEditer::saveTabletoXml()
@@ -103,6 +123,7 @@ void RuleEditer::on_act_Undo_triggered()
 void RuleEditer::on_act_Save_triggered()
 {
     themodel->submitAll();
+    showXml();
 }
 
 void RuleEditer::on_act_Saveto_triggered()
@@ -163,6 +184,7 @@ void RuleEditer::on_act_New_triggered()
     themodel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     themodel->select();
     curtable = tablename;
+    intXmlFile(INIT_NEW);
 }
 
 void RuleEditer::on_act_Open_triggered()
@@ -177,7 +199,10 @@ void RuleEditer::on_act_Open_triggered()
         themodel->select();
         curtable = tablename;
     }
+    intXmlFile(INIT_OPEN);
 }
 
+void RuleEditer::on_act_Drop_triggered()
+{
 
-
+}

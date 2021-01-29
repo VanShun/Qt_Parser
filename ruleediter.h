@@ -24,9 +24,15 @@ class RuleEditer : public QMainWindow
 public:
     explicit RuleEditer(QWidget *parent = nullptr);
     ~RuleEditer();
+
+    enum INITFLAG {
+        INIT_NEW,
+        INIT_OPEN
+    };
+
     void initEditer(void);
 
-    void intXmlFile(void);
+    void intXmlFile(INITFLAG flag);
 
     void showXml(void);
 
@@ -53,13 +59,16 @@ private slots:
 
     void on_act_trunc_triggered();
 
+    void on_act_Drop_triggered();
+
 private:
     Ui::RuleEditer *ui;
     QSqlTableModel *themodel;
     QSqlDatabase db;
     QString curtable;
     QString xmlfilename;
-    QDomDocument doc;
+    QDomDocument readdoc;
+    QDomDocument writedoc;
     //QItemSelectionModel *theselect;
 };
 

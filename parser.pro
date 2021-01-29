@@ -18,15 +18,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    deletefile.cpp \
     main.cpp \
     mainwindow.cpp \
     ruleediter.cpp
 
 HEADERS += \
+    deletefile.h \
     mainwindow.h \
     ruleediter.h
 
 FORMS += \
+    deletefile.ui \
     mainwindow.ui \
     ruleediter.ui
 

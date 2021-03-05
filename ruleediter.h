@@ -25,14 +25,9 @@ public:
     explicit RuleEditer(QWidget *parent = nullptr);
     ~RuleEditer();
 
-    enum INITFLAG {
-        INIT_NEW,
-        INIT_OPEN
-    };
-
     void initEditer(void);
 
-    void intXmlFile(INITFLAG flag);
+    void intXmlFile(void);
 
     void showXml(void);
 
@@ -61,6 +56,8 @@ private slots:
 
     void on_act_Drop_triggered();
 
+    void on_act_Aplly_triggered();
+
 private:
     Ui::RuleEditer *ui;
     QSqlTableModel *themodel;
@@ -68,7 +65,7 @@ private:
     QString curtable;
     QString xmlfilename;
     QDomDocument readdoc;
-    QDomDocument writedoc;
+    //QDomDocument writedoc;
     //QItemSelectionModel *theselect;
 };
 

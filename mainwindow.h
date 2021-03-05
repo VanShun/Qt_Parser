@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtXml>
+#include <QTextDocument>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,11 +16,16 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void parseXml(QString filename);  //xml文件解析
+    void parseSeg(QString segname, QString lenstr, QString unitstr, QString precsionstr, QString offsetstr);
 
 private slots:
     void on_act_OpenEditer_triggered();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+    QString xmlfilename;
 };
 #endif // MAINWINDOW_H

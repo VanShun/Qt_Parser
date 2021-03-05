@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QLabel" name="label">
@@ -40,7 +40,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QLabel" name="label_2">
@@ -97,6 +97,18 @@
    <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="act_Aplly"/>
+  </widget>
   <action name="act_Save">
    <property name="text">
     <string>保存</string>
@@ -190,6 +202,14 @@
    </property>
    <property name="toolTip">
     <string>act_Drop</string>
+   </property>
+  </action>
+  <action name="act_Aplly">
+   <property name="text">
+    <string>运用规则表</string>
+   </property>
+   <property name="toolTip">
+    <string>act_Aplly</string>
    </property>
   </action>
  </widget>

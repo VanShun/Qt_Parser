@@ -1,5 +1,6 @@
 #include "ruleediter.h"
 #include "ui_ruleediter.h"
+#include "mainwindow.h"
 
 RuleEditer::RuleEditer(QWidget *parent) :
     QMainWindow(parent),
@@ -16,21 +17,6 @@ RuleEditer::~RuleEditer()
 
 void RuleEditer::initEditer()
 {
-#if 0
-    themodel = new QStandardItemModel(2, FIXED_CULUMCOUNT, this);
-    theselect = new QItemSelectionModel(themodel);
-    ui->tableView->setModel(themodel);
-    ui->tableView->setSelectionModel(theselect);
-    ui->tableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectItems);
-    QStringList headerlist;
-    headerlist << QString("字段名") << QString("字段长度") << QString("单位(没有则不填)")
-               << QString("精度(没有则不填)") << QString("偏移(没有则不填)");
-    themodel->setHorizontalHeaderLabels(headerlist);
-
-    theselect = new QItemSelectionModel(themodel);
-    ui->tableView->setSelectionModel(theselect);
-#endif
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("mydatabase");
     if (!db.open()) {
@@ -42,35 +28,17 @@ void RuleEditer::initEditer()
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
-void RuleEditer::intXmlFile(INITFLAG flag)
+void RuleEditer::intXmlFile(void)
 {
     xmlfilename = curtable;
     xmlfilename += ".xml";
-    QFile file(xmlfilename);
-    if (!file.open(QIODevice::ReadWrite)) {
-        qDebug() << QString("open file %1 failed").arg(xmlfilename) << endl;
-        return;
-    } else qDebug() << QString("open file %1 success").arg(xmlfilename) << endl;
-
-    if (flag == INIT_NEW) {
-        QDomProcessingInstruction instruction = writedoc.createProcessingInstruction("xml", "version=\"1.0\"encoding=\"UTF-8\"");
-        writedoc.appendChild(instruction);    //添加xml申明
-        QDomElement root = writedoc.createElement("协议");
-        writedoc.appendChild(root);           //添加根结点
-        QTextStream out(&file);
-        writedoc.save(out, 4);
-    } else if (flag == INIT_OPEN) {
-        if (readdoc.setContent(&file)) {
-            qDebug() << "readdoc setContent failed" << endl;
-        }
-    }
-    file.close();
     showXml();
 }
 
 void RuleEditer::showXml()
 {
     QFile afile(xmlfilename);
+    qDebug() << "sowXml";
     if (!afile.isOpen()) {
         if (!afile.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qDebug() << "open xml failed" << endl;
@@ -78,6 +46,7 @@ void RuleEditer::showXml()
         }
     }
     QTextStream astream(&afile);
+    ui->plainTextEdit->clear();
     ui->plainTextEdit->setPlainText(astream.readAll());
     astream.setAutoDetectUnicode(true);
     afile.close();
@@ -85,7 +54,72 @@ void RuleEditer::showXml()
 
 void RuleEditer::saveTabletoXml()
 {
+    QFile file(xmlfilename);
+    QDomDocument writedoc;
 
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        qDebug() << QString(" saveTabletoXml open file %1 failed").arg(xmlfilename) << endl;
+        return;
+    } else qDebug() << QString("saveTabletoXml open file %1 success").arg(xmlfilename) << endl;
+
+    QDomProcessingInstruction instruction = writedoc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
+    writedoc.appendChild(instruction);    //添加xml申明
+    QDomElement root = writedoc.createElement("协议");
+    writedoc.appendChild(root);           //添加根结点
+
+    QDomElement seg;// = rwdoc.createElement("字段");
+    QDomAttr id;// = rwdoc.createAttribute("字段编号");
+    QDomElement name;// = rwdoc.createElement("字段名称");
+    QDomElement len;// = rwdoc.createElement("字段长度");
+    QDomElement unit;// = rwdoc.createElement("单位");
+    QDomElement precision;// = rwdoc.createElement("精度");
+    QDomElement offset;// = rwdoc.createElement("偏移");
+    QDomText text;
+
+    int rowCount;
+    rowCount = themodel->rowCount();
+    for(int i = 0; i < rowCount; i++) {
+        seg = writedoc.createElement("字段");
+        id = writedoc.createAttribute("字段编号");
+        QString idstr = themodel->data(themodel->index(i, 0)).toString();
+        id.setValue(idstr);
+        seg.setAttributeNode(id);   //设置id
+
+        name = writedoc.createElement("字段名称");
+        QString namestr = themodel->data(themodel->index(i, 1)).toString();
+        text = writedoc.createTextNode(namestr);  //添加字段名
+        name.appendChild(text);
+
+        len = writedoc.createElement("字段长度");
+        QString lenstr = themodel->data(themodel->index(i, 2)).toString();
+        text = writedoc.createTextNode(lenstr);
+        len.appendChild(text);
+
+        unit = writedoc.createElement("单位");
+        QString unitstr = themodel->data(themodel->index(i, 3)).toString();
+        text = writedoc.createTextNode(unitstr);
+        unit.appendChild(text);
+
+        precision = writedoc.createElement("精度");
+        QString precstr = themodel->data(themodel->index(i, 4)).toString();
+        text = writedoc.createTextNode(precstr);
+        precision.appendChild(text);
+
+        offset = writedoc.createElement("偏移");
+        QString offsetstr = themodel->data(themodel->index(i, 5)).toString();
+        text = writedoc.createTextNode(offsetstr);
+        offset.appendChild(text);
+
+        seg.appendChild(name);
+        seg.appendChild(len);
+        seg.appendChild(unit);
+        seg.appendChild(precision);
+        seg.appendChild(offset);
+        root.appendChild(seg);
+    }
+    QTextStream out(&file);
+    writedoc.save(out, 4);
+    file.close();
 }
 
 void RuleEditer::on_act_Insert_triggered()
@@ -99,7 +133,6 @@ void RuleEditer::on_act_Insert_triggered()
 void RuleEditer::on_act_Apend_triggered()
 {
     int rowCount = themodel->rowCount();
-    qDebug() << "rowcount: " << rowCount;
     int id = rowCount;
     themodel->insertRow(rowCount);
     themodel->setData(themodel->index(rowCount, 0), id);
@@ -122,7 +155,9 @@ void RuleEditer::on_act_Undo_triggered()
 
 void RuleEditer::on_act_Save_triggered()
 {
+    themodel->setSort(0, Qt::AscendingOrder);   //按照第一列id升序排序
     themodel->submitAll();
+    saveTabletoXml();
     showXml();
 }
 
@@ -162,7 +197,7 @@ void RuleEditer::on_act_New_triggered()
 {
     bool ok;
     QString tablename = QInputDialog::getText(this, QString("请输入表名"), QString("表名"), QLineEdit::Normal, QString("table1"), &ok);
-    qDebug() << tablename << endl;
+    qDebug() << "newtable:" << tablename << endl;
     if (ok && !tablename.isEmpty()) {
         QSqlQuery query;
         QString str = "create table " + tablename;
@@ -184,7 +219,7 @@ void RuleEditer::on_act_New_triggered()
     themodel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     themodel->select();
     curtable = tablename;
-    intXmlFile(INIT_NEW);
+    intXmlFile();
 }
 
 void RuleEditer::on_act_Open_triggered()
@@ -194,15 +229,31 @@ void RuleEditer::on_act_Open_triggered()
     bool ok;
     QString tablename = QInputDialog::getItem(this, QString("打开规则表"), QString("选择表"), tablelist, 0, false, &ok);
     if (ok && !tablename.isEmpty()) {
+        qDebug() << "open table:" << tablename << endl;
         themodel->setTable(tablename);
         themodel->setEditStrategy(QSqlTableModel::OnManualSubmit);
         themodel->select();
         curtable = tablename;
+        intXmlFile();
     }
-    intXmlFile(INIT_OPEN);
 }
 
 void RuleEditer::on_act_Drop_triggered()
 {
+    QStringList tablelist;
+    tablelist = db.tables();
+    bool ok;
+    QString tablename = QInputDialog::getItem(this, QString("删除规则表"), QString("选择表"), tablelist, 0, false, &ok);
+    if (ok && !tablename.isEmpty()) {
+        QSqlQuery query;
+        if (!query.exec(QString("drop table %1").arg(tablename))) {
+            qDebug() << "drop table:" << tablename << " failed" << endl;
+        }
+    }
+}
 
+void RuleEditer::on_act_Aplly_triggered()
+{
+    MainWindow *parWind = (MainWindow*)parentWidget();
+    parWind->parseXml(xmlfilename);
 }

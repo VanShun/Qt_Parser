@@ -27,5 +27,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString xmlfilename;
+    QString orgstr;
+    int offset;
 };
 #endif // MAINWINDOW_H

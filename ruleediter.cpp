@@ -38,7 +38,6 @@ void RuleEditer::intXmlFile(void)
 void RuleEditer::showXml()
 {
     QFile afile(xmlfilename);
-    qDebug() << "sowXml";
     if (!afile.isOpen()) {
         if (!afile.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qDebug() << "open xml failed" << endl;
@@ -126,16 +125,24 @@ void RuleEditer::on_act_Insert_triggered()
 {
     int curRow = ui->tableView->currentIndex().row();
     int id = curRow;
+    int init_precision = 1;
+    int init_offset = 0;
     themodel->insertRow(curRow);
-    themodel->setData(themodel->index(curRow, 0), id);
+    themodel->setData(themodel->index(curRow, 0), id);   //插入新行自动设置id
+    themodel->setData(themodel->index(curRow, 4), init_precision); //精度初始为1
+    themodel->setData(themodel->index(curRow, 5), init_offset);
 }
 
 void RuleEditer::on_act_Apend_triggered()
 {
     int rowCount = themodel->rowCount();
     int id = rowCount;
+    int init_precision = 1;
+    int init_offset = 0;
     themodel->insertRow(rowCount);
-    themodel->setData(themodel->index(rowCount, 0), id);
+    themodel->setData(themodel->index(rowCount, 0), id); //id自动设置为行号
+    themodel->setData(themodel->index(rowCount, 4), init_precision); //精度初始为1
+    themodel->setData(themodel->index(rowCount, 5), init_offset);
 }
 
 void RuleEditer::on_act_Delete_triggered()

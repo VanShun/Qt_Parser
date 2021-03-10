@@ -73,6 +73,7 @@ void RuleEditer::saveTabletoXml()
     QDomElement unit;// = rwdoc.createElement("单位");
     QDomElement precision;// = rwdoc.createElement("精度");
     QDomElement offset;// = rwdoc.createElement("偏移");
+    QDomElement remarks;
     QDomText text;
 
     int rowCount;
@@ -109,11 +110,17 @@ void RuleEditer::saveTabletoXml()
         text = writedoc.createTextNode(offsetstr);
         offset.appendChild(text);
 
+        remarks = writedoc.createElement("备注");
+        QString remarksstr = themodel->data(themodel->index(i, 6)).toString();
+        text = writedoc.createTextNode(remarksstr);
+        remarks.appendChild(text);
+
         seg.appendChild(name);
         seg.appendChild(len);
         seg.appendChild(unit);
         seg.appendChild(precision);
         seg.appendChild(offset);
+        seg.appendChild(remarks);
         root.appendChild(seg);
     }
     QTextStream out(&file);
@@ -125,7 +132,7 @@ void RuleEditer::on_act_Insert_triggered()
 {
     int curRow = ui->tableView->currentIndex().row();
     int id = curRow;
-    int init_precision = 1;
+    float init_precision = 1;
     int init_offset = 0;
     themodel->insertRow(curRow);
     themodel->setData(themodel->index(curRow, 0), id);   //插入新行自动设置id
@@ -137,7 +144,7 @@ void RuleEditer::on_act_Apend_triggered()
 {
     int rowCount = themodel->rowCount();
     int id = rowCount;
-    int init_precision = 1;
+    float init_precision = 1;
     int init_offset = 0;
     themodel->insertRow(rowCount);
     themodel->setData(themodel->index(rowCount, 0), id); //id自动设置为行号
@@ -208,7 +215,7 @@ void RuleEditer::on_act_New_triggered()
     if (ok && !tablename.isEmpty()) {
         QSqlQuery query;
         QString str = "create table " + tablename;
-        str = str + "(id int primary key, name varchar(20), len int, unit varchar(10), precision float, offset int)";
+        str = str + "(id int primary key, name varchar(20), len int, unit varchar(10), precision float, offset int, remarks varchar(20))";
 
         if (!query.exec(str)) {
             qDebug() << "create table failed";

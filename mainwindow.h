@@ -17,7 +17,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void parseXml(QString filename);  //xml文件解析
-    void parseSeg(QString segname, QString lenstr, QString unitstr, QString precsionstr, QString offsetstr);
+    void parseSeg(QString segname, QString lenstr, QString unitstr, QString precsionstr, QString offsetstr, QString remarksstr);
 
 private slots:
     void on_act_OpenEditer_triggered();

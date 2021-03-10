@@ -20,7 +20,7 @@ void MainWindow::parseXml(QString filename)
     xmlfilename = filename;
 }
 
-void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QString precsionstr, QString offsetstr)
+void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QString precsionstr, QString offsetstr, QString remarksstr)
 {
     qDebug() << QString("parseseg, segname:%1, lenstr:%2, unitstr:%3, precsionstr:%4, offsetstr:%5").
                 arg(segname).arg(lenstr).arg(unitstr).arg(precsionstr).arg(offsetstr);
@@ -35,6 +35,15 @@ void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QStr
     double orgvalue, realvalue, precison, valueoffset;
 
     if (unitstr.isEmpty()) {
+        if (!remarksstr.isEmpty()) {
+            if (remarksstr == QString("字符串")) {   //字符串，将十六进制ASCII码解析成字符串展示出来
+                QByteArray orgarray = valuestr.toLatin1();
+                QByteArray convertarray = orgarray.fromHex(orgarray);
+                valuestr = convertarray;
+            } else {
+                valuestr += QString(" 备注: %1").arg(remarksstr);
+            }
+        }
         tostr += valuestr;
     } else {        //有单位的数值型数据，需要根据精度偏移计算实际值
         orgvalue = valuestr.toFloat();
@@ -46,6 +55,9 @@ void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QStr
         valuestr = QString("%1").arg(realvalue);
         tostr += valuestr;
         tostr += QString(" 单位：%1").arg(unitstr);
+        if (!remarksstr.isEmpty()) {
+            tostr += QString(" 备注: %1").arg(remarksstr);
+        }
     }
 
     ui->plainTextEdit_2->appendPlainText(tostr);
@@ -88,7 +100,7 @@ void MainWindow::on_pushButton_clicked()
     offset = 0;
 
     //遍历xml文件
-    QString segname, lenstr, unitstr, precsionstr, offsetstr;
+    QString segname, lenstr, unitstr, precsionstr, offsetstr, remarksstr;
     QDomElement docElement = readdoc.documentElement();
     QDomNode node = docElement.firstChild();
     while (!node.isNull()) {
@@ -108,11 +120,13 @@ void MainWindow::on_pushButton_clicked()
                         precsionstr = n.toElement().text();
                     } else if (n.toElement().tagName() == QString("偏移")) {
                         offsetstr = n.toElement().text();
+                    } else if (n.toElement().tagName() == QString("备注")) {
+                        remarksstr = n.toElement().text();
                     }
                 }
             }
         }
-        parseSeg(segname, lenstr, unitstr, precsionstr, offsetstr);
+        parseSeg(segname, lenstr, unitstr, precsionstr, offsetstr, remarksstr);
         node = node.nextSibling();
     }
 }

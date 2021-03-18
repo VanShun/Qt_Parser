@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>About</class>
+ <widget class="QDialog" name="About">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>690</width>
+    <height>441</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>帮助</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="mysource.qrc">
+    <normaloff>:/images/help.png</normaloff>:/images/help.png</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QPlainTextEdit" name="plainTextEdit">
+     <property name="plainText">
+      <string>关于规则编辑器：
+1.表头：id\字段名\字段长度\单位\精度\偏移\备注。
+2.id一般不需要手动修改，最终解析按照id顺序解析，字段名不能为空。单位初始值为空，精度初始值为1，偏移初始值为0。
+3.对于字符串字段，如VIN，需要备注&quot;字符串&quot;。
+4.对于不定长字段，如第17行为故障码总数字段，第18行为故障码列表字段，长度为故障码总数*4，则在故障码列表字段的备注中备注&quot;$17*4&quot;，同时字段长度设置为0或者空。
+5.对于数值型字段，有单位的需要写上单位。
+6.规则表编辑完保存并点击&quot;运用规则表&quot;按钮才能实际生效</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="mysource.qrc"/>
+ </resources>
+ <connections/>
+</ui>

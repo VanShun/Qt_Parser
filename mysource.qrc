@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>analyze.png</file>
+        <file>newfile.png</file>
+        <file>save.png</file>
+        <file>change.png</file>
+        <file>delete.png</file>
+        <file>openfile.png</file>
+        <file>saveto.png</file>
+        <file>deletefile.png</file>
+        <file>edit.png</file>
+        <file>image1.jpg</file>
+        <file>add.png</file>
+        <file>empty.png</file>
+        <file>help.png</file>
+        <file>insert_above.png</file>
+        <file>insert_below.png</file>
+        <file>undo.png</file>
+        <file>finger.png</file>
+        <file>point.png</file>
+        <file>sheets.png</file>
+        <file>finish.png</file>
+    </qresource>
+</RCC>

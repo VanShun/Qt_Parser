@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->pushButton->setEnabled(false);
+    //setStyleSheet("QComboBox::drop-down{image:url(:/sheets.png)}");
 }
 
 MainWindow::~MainWindow()
@@ -24,7 +26,13 @@ void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QStr
 {
     qDebug() << QString("parseseg, segname:%1, lenstr:%2, unitstr:%3, precsionstr:%4, offsetstr:%5").
                 arg(segname).arg(lenstr).arg(unitstr).arg(precsionstr).arg(offsetstr);
-    int seglen = lenstr.toInt();
+    int seglen = 0;
+    if (lenstr == "0" || lenstr == 0) {
+        seglen = parseRegExp(remarksstr);
+        qDebug() << "seglen: " << seglen << endl;
+    } else {
+        seglen = lenstr.toInt();
+    }
     if (offset + seglen * 2 > orgstr.size()) {  //1字节两字符
         qDebug() << QString("err,seglen:%1, offset:%2").arg(seglen).arg(offset);
         QMessageBox::warning(this, QString("错误提示"), QString("数据长度错误"));
@@ -32,7 +40,8 @@ void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QStr
     }
     QString tostr = segname + ": ";
     QString valuestr = orgstr.mid(offset, seglen * 2);
-    double orgvalue, realvalue, precison, valueoffset;
+    int orgvalue;
+    double realvalue, precison, valueoffset;
 
     if (unitstr.isEmpty()) {
         if (!remarksstr.isEmpty()) {
@@ -46,7 +55,7 @@ void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QStr
         }
         tostr += valuestr;
     } else {        //有单位的数值型数据，需要根据精度偏移计算实际值
-        orgvalue = valuestr.toFloat();
+        orgvalue = valuestr.toInt(nullptr ,16);
         precison = precsionstr.toFloat();
         valueoffset = offsetstr.toFloat();
         realvalue = orgvalue * precison + valueoffset;
@@ -59,9 +68,56 @@ void MainWindow::parseSeg(QString segname, QString lenstr, QString unitstr, QStr
             tostr += QString(" 备注: %1").arg(remarksstr);
         }
     }
+    valuestrlist << valuestr;
 
     ui->plainTextEdit_2->appendPlainText(tostr);
     offset += seglen * 2;
+}
+
+int MainWindow::parseRegExp(QString regstr)
+{
+    QRegExp rxlen("(^\\$)(\\d+)(\\+|\\-|\\*|\\/)(\\d+)");
+    regstr.remove(QRegExp("\\s*"));
+    qDebug() << QString("regstr:%1").arg(regstr);
+    int pos = rxlen.indexIn(regstr);
+    qDebug() << QString("pos0:%1, pos1:%2, pos2:%3, pos3:%4").arg(rxlen.pos(0)).arg(rxlen.pos(1)).arg(rxlen.pos(2)).arg(rxlen.pos(3));
+    int result = 0;
+    if (pos > -1) {
+        qDebug() << rxlen.cap(0);
+        QString value1str = rxlen.cap(2);
+        QString op = rxlen.cap(3);
+        QString value2str = rxlen.cap(4);
+        int count = rxlen.captureCount();
+        qDebug() << QString("value1:%1, op:%2, value2:%3, count:%4").arg(value1str).arg(op).arg(value2str).arg(count);
+        int i = value1str.toInt();
+        QString ivaluestr = valuestrlist.at(i - 1);
+        int ivalue = ivaluestr.toInt();
+        int value2 = value2str.toInt();
+        if (op == "+") {
+            result = ivalue + value2;
+        } else if (op == "-") {
+            result = ivalue - value2;
+        } else if (op == "*") {
+            result = ivalue * value2;
+        } else if (op == "/") {
+            result = ivalue * value2;
+        }
+    } else qDebug() << "no match" << endl;
+    qDebug() << "result: " << result << endl;
+    return result;
+}
+
+QString MainWindow::getVluestr(int i)
+{
+    return valuestrlist.at(i);
+}
+
+void MainWindow::curTableChanged(QString tablename)
+{
+    statuslabel.clear();
+    statuslabel.setText(QString("    当前运用的规则表: %1").arg(tablename));
+    ui->statusbar->addWidget((QWidget *)&statuslabel);
+    ui->pushButton->setEnabled(true);
 }
 
 

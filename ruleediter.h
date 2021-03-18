@@ -10,6 +10,7 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QtXml>
+#include <QSqlError>
 
 //#define FIXED_CULUMCOUNT     5
 
@@ -34,7 +35,9 @@ public:
     void saveTabletoXml(void);
 
 private slots:
-    void on_act_Insert_triggered();
+    void on_act_Insert_Above_triggered();
+
+    void on_act_Insert_Under_triggered();
 
     void on_act_Apend_triggered();
 
@@ -58,15 +61,15 @@ private slots:
 
     void on_act_Aplly_triggered();
 
+    void on_act_help_triggered();
+
 private:
     Ui::RuleEditer *ui;
     QSqlTableModel *themodel;
     QSqlDatabase db;
     QString curtable;
     QString xmlfilename;
-    QDomDocument readdoc;
-    //QDomDocument writedoc;
-    //QItemSelectionModel *theselect;
+    //QLabel status;
 };
 
 #endif // RULEEDITER_H

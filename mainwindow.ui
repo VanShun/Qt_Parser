@@ -11,7 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>协议解析工具</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="mysource.qrc">
+    <normaloff>:/images/analyze.png</normaloff>:/images/analyze.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
@@ -22,7 +29,7 @@
       </property>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
-        <string>待解析报文</string>
+        <string>报文</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
@@ -61,8 +68,24 @@
             <height>75</height>
            </size>
           </property>
-          <property name="text">
+          <property name="toolTip">
            <string>解析</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="mysource.qrc">
+            <normaloff>:/images/point.png</normaloff>:/images/point.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -74,7 +97,11 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+         <widget class="QPlainTextEdit" name="plainTextEdit_2">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -101,6 +128,10 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="act_OpenEditer">
+   <property name="icon">
+    <iconset resource="mysource.qrc">
+     <normaloff>:/images/edit.png</normaloff>:/images/edit.png</iconset>
+   </property>
    <property name="text">
     <string>打开编辑器</string>
    </property>
@@ -112,6 +143,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="mysource.qrc"/>
+ </resources>
  <connections/>
 </ui>

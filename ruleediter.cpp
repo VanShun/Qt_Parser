@@ -1,6 +1,7 @@
 #include "ruleediter.h"
 #include "ui_ruleediter.h"
 #include "mainwindow.h"
+#include "about.h"
 
 RuleEditer::RuleEditer(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +33,8 @@ void RuleEditer::intXmlFile(void)
 {
     xmlfilename = curtable;
     xmlfilename += ".xml";
+    themodel->setSort(0, Qt::AscendingOrder);   //按照第一列id升序排序
+    themodel->submitAll();
     showXml();
 }
 
@@ -128,9 +131,10 @@ void RuleEditer::saveTabletoXml()
     file.close();
 }
 
-void RuleEditer::on_act_Insert_triggered()
+void RuleEditer::on_act_Insert_Above_triggered()
 {
     int curRow = ui->tableView->currentIndex().row();
+
     int id = curRow;
     float init_precision = 1;
     int init_offset = 0;
@@ -138,12 +142,35 @@ void RuleEditer::on_act_Insert_triggered()
     themodel->setData(themodel->index(curRow, 0), id);   //插入新行自动设置id
     themodel->setData(themodel->index(curRow, 4), init_precision); //精度初始为1
     themodel->setData(themodel->index(curRow, 5), init_offset);
+    qDebug() << "curRow:" << curRow << "rowCount:" << themodel->rowCount() << endl;
+    for (int i = curRow; i < themodel->rowCount(); i++) {
+        themodel->setData(themodel->index(i, 0), i + 1);
+    }
+    //themodel->setSort(0, Qt::AscendingOrder);   //按照第一列id升序排序
+}
+
+void RuleEditer::on_act_Insert_Under_triggered()
+{
+    int curRow = ui->tableView->currentIndex().row();
+    qDebug() << "curRow:" << curRow << "rowCount:" << themodel->rowCount() << endl;
+    int id = curRow + 2;
+    float init_precision = 1.0;
+    int init_offset = 0;
+    themodel->insertRow(curRow);
+    themodel->setData(themodel->index(curRow, 0), id);   //插入新行自动设置id
+    themodel->setData(themodel->index(curRow, 4), init_precision); //精度初始为1
+    themodel->setData(themodel->index(curRow, 5), init_offset);
+    qDebug() << "curRow:" << curRow << "rowCount:" << themodel->rowCount() << endl;
+    for (int i = curRow + 2; i < themodel->rowCount(); i++) {
+        themodel->setData(themodel->index(i, 0), i + 1);
+    }
+    //themodel->setSort(0, Qt::AscendingOrder);   //按照第一列id升序排序
 }
 
 void RuleEditer::on_act_Apend_triggered()
 {
     int rowCount = themodel->rowCount();
-    int id = rowCount;
+    int id = rowCount + 1;
     float init_precision = 1;
     int init_offset = 0;
     themodel->insertRow(rowCount);
@@ -155,11 +182,12 @@ void RuleEditer::on_act_Apend_triggered()
 void RuleEditer::on_act_Delete_triggered()
 {
     int curRow = ui->tableView->currentIndex().row();
+    qDebug() << "curRow:" << curRow << "rowCount:" << themodel->rowCount() << endl;
     themodel->removeRow(curRow);
-    //QModelIndexList indexlist = theselect->selectedRows(0);
-    //for (int i = 0; i < indexlist.count(); i++) {
-        //themodel->removeRow(indexlist.at(i).row());
-    //}
+    qDebug() << "curRow:" << curRow << "rowCount:" << themodel->rowCount() << endl;
+    for (int i = curRow; i < themodel->rowCount(); i++) {
+        themodel->setData(themodel->index(i, 0), i);
+    }
 }
 
 void RuleEditer::on_act_Undo_triggered()
@@ -169,15 +197,39 @@ void RuleEditer::on_act_Undo_triggered()
 
 void RuleEditer::on_act_Save_triggered()
 {
+    themodel->database().transaction();
+    if (themodel->submitAll()) {
+        themodel->database().commit();
+    } else {
+        qDebug() << "submitAll err:" << themodel->lastError().text();
+        themodel->database().rollback();
+    }
+
     themodel->setSort(0, Qt::AscendingOrder);   //按照第一列id升序排序
-    themodel->submitAll();
     saveTabletoXml();
     showXml();
 }
 
 void RuleEditer::on_act_Saveto_triggered()
 {
-
+    bool ok;
+    QString tablename = QInputDialog::getText(this, QString("另存为"), QString("表名"), QLineEdit::Normal, QString("table1"), &ok);
+    if (ok && !tablename.isEmpty()) {
+        QSqlQuery query;
+        QStringList tablelist = db.tables();
+        for (int i = 0; i < tablelist.count(); i++) {
+            if(tablelist.at(i) == tablename) {
+                QMessageBox::information(this, QString("错误提示"), QString("文件已存在，不能新建同名文件!"), QMessageBox::Ok, QMessageBox::NoButton);
+                return;
+            }
+        }
+        //QString str = QString("select * into %1 from %2").arg(tablename).arg(curtable);
+        QString str = QString("create table %1 as select * from %2").arg(tablename).arg(curtable);
+        qDebug() << str << endl;
+        if (!query.exec(str)) {
+            qDebug() << "query.exec failed:" << query.lastError().text() << endl;
+        }
+    }
 }
 
 void RuleEditer::on_act_trunc_triggered()
@@ -198,7 +250,8 @@ void RuleEditer::on_tableView_customContextMenuRequested(const QPoint &pos)
 {
     Q_UNUSED(pos);
     QMenu *menulist = new QMenu(this);
-    menulist->addAction(ui->act_Insert);
+    menulist->addAction(ui->act_Insert_Above);
+    menulist->addAction(ui->act_Insert_Under);
     menulist->addAction(ui->act_Apend);
     menulist->addAction(ui->act_Delete);
     menulist->addAction(ui->act_Undo);
@@ -215,7 +268,7 @@ void RuleEditer::on_act_New_triggered()
     if (ok && !tablename.isEmpty()) {
         QSqlQuery query;
         QString str = "create table " + tablename;
-        str = str + "(id int primary key, name varchar(20), len int, unit varchar(10), precision float, offset int, remarks varchar(20))";
+        str = str + "(id int, name varchar(20) not null, len int, unit varchar(10), precision float, offset int, remarks varchar(50))";
 
         if (!query.exec(str)) {
             qDebug() << "create table failed";
@@ -247,6 +300,7 @@ void RuleEditer::on_act_Open_triggered()
         themodel->setTable(tablename);
         themodel->setEditStrategy(QSqlTableModel::OnManualSubmit);
         themodel->select();
+        themodel->setSort(0, Qt::AscendingOrder);   //按照第一列id升序排序
         curtable = tablename;
         intXmlFile();
     }
@@ -264,10 +318,27 @@ void RuleEditer::on_act_Drop_triggered()
             qDebug() << "drop table:" << tablename << " failed" << endl;
         }
     }
+    /* 一起删除对应的xml文件 */
+    QString dxmlfile = tablename + ".xml";
+    QFile file(dxmlfile);
+    if (!file.remove()) {
+        qDebug() << "删除对应xml文件失败";
+    }
 }
 
 void RuleEditer::on_act_Aplly_triggered()
 {
     MainWindow *parWind = (MainWindow*)parentWidget();
     parWind->parseXml(xmlfilename);
+    parWind->curTableChanged(curtable);
 }
+
+
+void RuleEditer::on_act_help_triggered()
+{
+    About *about = new About(this);
+    about->setAttribute(Qt::WA_DeleteOnClose);
+    about->setWindowFlag(Qt::Dialog);
+    about->show();
+}
+
